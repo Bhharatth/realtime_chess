@@ -6,6 +6,9 @@ import compression from "compression";
 import cors from "cors";
 import mongoose, { mongo } from "mongoose";
 import { Request, Response } from 'express';
+import authRoute from "./routes/auth"
+
+
 
 
 const app = express();
@@ -52,16 +55,20 @@ app.get("/", (req: express.Request, res: express.Response)=> {
     res.json(chessBoard);
 });
 
+app.use("/auth", authRoute)
 
 
 
 
 
+
+
+
+const MONGO_URL = "mongodb+srv://appu:appu123@cluster0.5c3rgox.mongodb.net/?retryWrites=true&w=majority"
 server.listen(8080, () => {
     console.log('server running on http://localhost:8080/')
 });
 
-const MONGO_URL = "mongodb+srv://appu:appu123@cluster0.5c3rgox.mongodb.net/?retryWrites=true&w=majority"
 
 mongoose.Promise = Promise;
 mongoose.connect(MONGO_URL);
