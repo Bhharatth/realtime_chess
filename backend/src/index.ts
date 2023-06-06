@@ -6,7 +6,9 @@ import compression from "compression";
 import cors from "cors";
 import mongoose, { mongo } from "mongoose";
 import { Request, Response } from 'express';
-import authRoute from "./routes/auth"
+import authRoute from "./routes/auth";
+import sockets from "sockets/routes";
+import { Server } from "socket.io";
 
 
 
@@ -22,6 +24,13 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 
 const server = http.createServer(app);
+
+
+const io = new Server(server, {
+    cors: {
+      origin: ["http://localhost:3000"],
+    },
+  });
 
 // let chessBoard: (null | any)[][] = [];
 // for (let i = 0; i < 8; i++) {
@@ -55,7 +64,8 @@ app.get("/", (req: express.Request, res: express.Response)=> {
     res.json(chessBoard);
 });
 
-app.use("/auth", authRoute)
+app.use("/api/auth", authRoute);
+// app.use("/api/chat",c)
 
 
 

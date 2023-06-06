@@ -23,7 +23,6 @@ export const register = async (req: express.Request, res: express.Response) => {
             email,
             password: hashedPassword,
         });
-
         await newUser.save();
         res.status(200).json(newUser);
     } catch (error) {
