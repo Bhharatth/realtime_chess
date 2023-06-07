@@ -8,8 +8,9 @@ import mongoose, { mongo } from "mongoose";
 import { Request, Response } from 'express';
 import authRoute from "./routes/auth";
 import { Server } from "socket.io";
-import sockets from "./sockets/routes";
+// import sockets from "./sockets/routes";
 import { Socket } from "socket.io";
+
 
 
 
@@ -67,11 +68,37 @@ app.get("/", (req: express.Request, res: express.Response)=> {
     res.json(chessBoard);
 });
 
+
+
 io.on("connection", (socket: Socket) => {
-    sockets(socket);
+    // Handle the "join-room" event
+    socket.on("join-room", ({ roomId }: { roomId: string }) => {
+      socket.join(roomId);
+      // Additional logic for handling room joining
+    });
+  
+    // Handle the "send-message" event
+    socket.on("send-message", ({ message, roomId, user }: { message: string, roomId: string, user: string }) => {
+      // Handle the received message
+      console.log("Received message:", message);
+  
+      // Broadcast the message to all clients in the room
+      io.to(roomId).emit("message-from-server", { message });
+      // Additional logic for handling and broadcasting messages
+    });
+  
+    // Add more event handlers for other events as needed
+  
+    // Handle the "disconnect" event
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
+      // Additional logic for handling disconnections
+    });
   });
+  
+
+
 app.use("/api/auth", authRoute);
-// app.use("/api/chat",c)
 
 
 
