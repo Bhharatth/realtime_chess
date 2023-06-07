@@ -1,7 +1,8 @@
 import MessageController from "./controllers/messageController"
 import RoomController from "./controllers/roomController";
+import { Socket } from "socket.io";
 
-const sockets = ({ socket }: { socket: any }) => {
+const sockets =  (socket: Socket) => {
     const messageController = new MessageController(socket);
     const roomController = new RoomController(socket);
 
@@ -10,7 +11,7 @@ const sockets = ({ socket }: { socket: any }) => {
     socket.on("new-room-created", roomController.newRoomCreated);
 
     socket.on("endCall", () => {
-        socket.broadcast.emit("callended");
+        socket.broadcast.emit("call ended");
     });
 
     socket.on("disconnect", () => {

@@ -7,13 +7,16 @@ import cors from "cors";
 import mongoose, { mongo } from "mongoose";
 import { Request, Response } from 'express';
 import authRoute from "./routes/auth";
-import sockets from "sockets/routes";
 import { Server } from "socket.io";
+import sockets from "./sockets/routes";
+import { Socket } from "socket.io";
+
 
 
 
 
 const app = express();
+app.use(express.json())
 
 app.use(cors({
     credentials: true,
@@ -64,6 +67,9 @@ app.get("/", (req: express.Request, res: express.Response)=> {
     res.json(chessBoard);
 });
 
+io.on("connection", (socket: Socket) => {
+    sockets(socket);
+  });
 app.use("/api/auth", authRoute);
 // app.use("/api/chat",c)
 

@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
-import BaseController from './baseController';
-import Room from 'sockets/models/room';
+import BaseController from "./baseController";
+import Room from '../models/room';
 
 export default class MessageController extends BaseController {
     sendMessage = async({message,room,user }:{message: string; room: string; user: string})=> {

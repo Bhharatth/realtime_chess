@@ -1,4 +1,4 @@
-import Room from "sockets/models/room";
+import Room from "../models/room";
 import BaseController from "./baseController";
 
 
@@ -17,7 +17,7 @@ export default class RoomController extends BaseController {
             await room.save();
             this.socket.emit("new-room-created-server", {roomId})
          }else{
-            this.socket.emit("new-room-created-server",roomFound[0].roomId)
+            this.socket.emit("new-room-created-server",roomFound[0])
          }
     }
 
