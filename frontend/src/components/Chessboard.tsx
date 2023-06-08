@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './chessboard.css'
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
+import { Socket } from "socket.io-client";
+
+const io = require("socket.io-client");
 
 const Chessboard = () => {
+  const socket = useRef<Socket | undefined>();
     const [spot, setSpot] = useState(null);
+
+    const user = useSelector((state: RootState) => state.user);
+    const userId = user.currentUser ? user.currentUser._id : null;
+
 
     const chessboardArray = [
         ["1,1", "1,2", "1,3", "1,4", "1,5", "1,6", "1,7", "1,8"],
@@ -14,12 +24,32 @@ const Chessboard = () => {
         ["7,1", "7,2", "7,3", "7,4", "7,5", "7,6", "7,7", "7,8"],
         ["8,1", "8,2", "8,3", "8,4", "8,5", "8,6", "8,7", "8,8"],
       ];
-    //   const handleClick=()=>{
+    
 
-    //   }
+    useEffect(() => {
+      socket.current = io("ws://localhost:8900");
+    }, []);
+
+
+  //sending users to socket server 
+  //geting users and socketId from server
+
+    useEffect(()=> {
+      socket.current?.emit("add_user", userId);
+      socket.current?.on("getUsers", (data: object)=> {
+        console.log(data)
+      });
+    },[user]);
+
+
+  //geting users from socket client
+    useEffect(()=> {
+     
+
+    },[]);
+
     function handleClick(rowIndex: number, cellIndex: number) {
         console.log(`${rowIndex},${cellIndex}`);
-        // Perform any desired actions here based on the clicked cell
       }
       
       return (

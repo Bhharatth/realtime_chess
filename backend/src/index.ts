@@ -10,7 +10,7 @@ import authRoute from "./routes/auth";
 import { Server } from "socket.io";
 // import sockets from "./sockets/routes";
 import { Socket } from "socket.io";
-
+import { initializeSocketServer } from "./socket/server";
 
 
 
@@ -30,11 +30,12 @@ app.use(bodyParser.json());
 const server = http.createServer(app);
 
 
-const io = new Server(server, {
-    cors: {
-      origin: ["http://localhost:3000"],
-    },
-  });
+const io = require("socket.io")(8900, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+});
+  initializeSocketServer(io);
 
 // let chessBoard: (null | any)[][] = [];
 // for (let i = 0; i < 8; i++) {
