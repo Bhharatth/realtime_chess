@@ -3,7 +3,12 @@ import { createSlice } from "@reduxjs/toolkit";
 const userSlice = createSlice({
   name: "user",
   initialState: {
-    currentUser: null,
+    currentUser: {
+      _id: null,
+      username: null,
+      email: null,
+      __v: 0
+    },
     isFetching: false,
     error: false,
   },
