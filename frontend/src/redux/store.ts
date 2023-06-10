@@ -11,13 +11,14 @@ import {
     REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import selectedPlayerSlice from "./selectedPlayerSlice";
 
 const persistConfig = {
   key: 'root',
   version: 1,
   storage,
 };
-const rootReducer = combineReducers({ user: userSlice });
+const rootReducer = combineReducers({ user: userSlice , selectedPlayer: selectedPlayerSlice});
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
