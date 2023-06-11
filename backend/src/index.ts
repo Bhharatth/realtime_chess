@@ -8,6 +8,7 @@ import mongoose, { mongo } from "mongoose";
 import { Request, Response } from 'express';
 import authRoute from "./routes/auth";
 import userRoute from "./routes/userRoutes";
+import conversationsRoute from "./routes/converssationRoute";
 import { Server } from "socket.io";
 // import sockets from "./sockets/routes";
 import { Socket } from "socket.io";
@@ -101,7 +102,8 @@ io.on("connection", (socket: Socket) => {
 
 
 app.use("/api/auth", authRoute);
-app.use("/api/users", userRoute)
+app.use("/api/users", userRoute);
+app.use("/api/conversations", conversationsRoute);
 
 
 

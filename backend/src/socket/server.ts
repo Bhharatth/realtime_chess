@@ -1,23 +1,34 @@
 import { Server, Socket } from "socket.io";
 
-let users: { userId: string, socketId: string }[] = [];
+interface User {
+  userId: string;
+  socketId: string;
+  room?: string;
+}
+
+let users: User[] = [];
 
 
-  //add user
-  const addUser = (userId: string, socketId: string) => {
+const randomRoomNumber = (): string => {
+  return Math.floor(Math.random() * 1000).toString();
+}
+
+
+  //add user to a room
+  const addUserToRoom = (userId: string, socketId: string, room: string) => {
     if (!(users.some((user) => user.userId === userId))) {
-      users.push({ userId, socketId });
-    }
+      users.push({ userId, socketId, room });
+    };
   };
 
-  //remove user
-  const removeUser = (socketId: string) => {
+  //remove user from a room
+  const removeUserFromRoom = (socketId: string) => {
     users = users.filter((user) => user.socketId !== socketId);
   };
 
   //get users
-  const getUsers = (userId: string) => {
-    return users.find((user) => user.userId === userId);
+  const getUsersInRoom = (room: string) => {
+    return  users.filter((user) => user.room === room);
   }
 
 
@@ -29,15 +40,17 @@ export function initializeSocketServer(io: Server) {
 
     // Handle "add_user" event
     socket.on("add_user", (userId: string) => {
-      addUser(userId, socket.id);
+      const roomNumber = randomRoomNumber();
+      addUserToRoom(userId, socket.id, roomNumber);
       io.emit("getUsers", users);
+      socket.emit("roomNumber", roomNumber);
     });
 
     io.emit("welcome","helloo")
 
     // Handle "send-message" event
     socket.on("send-message", ({ senderId, receiverId, text }) => {
-      const receiver = getUsers(receiverId);
+      const receiver = getUsersInRoom("room1").find((user:User)=> user.userId === receiverId);
       if (receiver && receiver.socketId) {
         io.to(receiver.socketId).emit("getMessage", {
           senderId,
@@ -49,7 +62,7 @@ export function initializeSocketServer(io: Server) {
     // Handle "disconnect" event
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
-      removeUser(socket.id);
+      removeUserFromRoom(socket.id);
     });
   });
 }
