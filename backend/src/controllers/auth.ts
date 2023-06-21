@@ -16,7 +16,7 @@ export const register = async (req: express.Request, res: express.Response) => {
             const hashedPassword = await bcrypt.hash(password, saltRounds);
             return hashedPassword;
           };
-          const hashedPassword = await hashPassword(password)
+          const hashedPassword = await hashPassword(String(password))
      
         const newUser = new User({
             username,
@@ -28,39 +28,86 @@ export const register = async (req: express.Request, res: express.Response) => {
     } catch (error) {
         res.status(400).json(error)
     }
-}
+};
+
+// export const Login = async (req: express.Request, res: express.Response) => {
+//     try {
+//         const { username, password } = req.body;
+//         if (!username || !password) {
+//             res.status(400).json("enter username and password")
+//         }
+//         const user = await User.findOne({ username });
+//         if (!user) {
+//             res.status(400).json("no user found");
+//             return;
+
+//         };
+
+//         const hashedPassword:string = user.password;
+//         const comparePassword = async (password: string, hashedPassword: string): Promise<boolean> => {
+//             return bcrypt.compare(password, hashedPassword);
+//         };
+       
+//         const passwordMatch:Boolean = await comparePassword(password, hashedPassword);
+
+//         if (passwordMatch) {
+//             const { password, ...others } = user.toObject() as Document & {
+//               username: string;
+//               email: string;
+//               password: string;
+//             };
+//             res.status(200).json(others);
+//         }else{
+//             res.status(400).json("you enter wrong password")
+//         }
+//     } catch (error) {
+//         console.log(error)
+//     }
+// };
 
 export const Login = async (req: express.Request, res: express.Response) => {
     try {
         const { username, password } = req.body;
         if (!username || !password) {
-            res.status(400).json("enter username and password")
+            res.status(400).json("enter username and password");
+            return;
         }
         const user = await User.findOne({ username });
         if (!user) {
             res.status(400).json("no user found");
             return;
+        }
 
-        };
+        const hashedPassword: string = user.password;
+        // const comparePassword =  (password: string, hashedPassword: string): Promise<boolean> => {
+        //     // return await bcrypt.compare(password, hashedPassword);
+        // };
 
-        const hashedPassword = user.password;
-        const comparePassword = (password: string, hashedPassword: string): Promise<boolean> => {
-            return bcrypt.compare(password, hashedPassword);
-        };
-       
-        const passwordMatch = await comparePassword(password, hashedPassword);
+         const comparePassword = (password: string, hashedPassword: string): Promise<boolean> => {
+            return new Promise((resolve, reject) => {
+              bcrypt.compare(String(password), String(hashedPassword), (error, result) => {
+                if (error) {
+                  reject(error);
+                } else {
+                  resolve(result);
+                }
+              });
+            });
+          };
+
+        const passwordMatch: boolean = await comparePassword(password, hashedPassword);
 
         if (passwordMatch) {
-            const { password, ...others } = user.toObject() as Document & {
-              username: string;
-              email: string;
-              password: string;
+            const { password: userPassword, ...others } = user.toObject() as {
+                username: string;
+                email: string;
+                password: string;
             };
             res.status(200).json(others);
-        }else{
-            res.status(400).json("you enter wrong password")
+        } else {
+            res.status(400).json("you entered the wrong password");
         }
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 }

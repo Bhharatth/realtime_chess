@@ -3,21 +3,18 @@ import { Server, Socket } from "socket.io";
 interface User {
   userId: string;
   socketId: string;
-  room?: string;
+  // room?: string;
 }
 
 let users: User[] = [];
 
 
-const randomRoomNumber = (): string => {
-  return Math.floor(Math.random() * 1000).toString();
-}
 
 
   //add user to a room
-  const addUserToRoom = (userId: string, socketId: string, room: string) => {
+  const addUserToRoom = (userId: string, socketId: string) => {
     if (!(users.some((user) => user.userId === userId))) {
-      users.push({ userId, socketId, room });
+      users.push({ userId, socketId });
     };
   };
 
@@ -27,10 +24,9 @@ const randomRoomNumber = (): string => {
   };
 
   //get users
-  const getUsersInRoom = (room: string) => {
-    return  users.filter((user) => user.room === room);
-  }
-
+  const getUserById = (userId: string): User | undefined => {
+    return users.find((user) => user.userId === userId);
+  };
 
   //when connect
  // Initialize the Socket.IO server and handle events
@@ -40,17 +36,15 @@ export function initializeSocketServer(io: Server) {
 
     // Handle "add_user" event
     socket.on("add_user", (userId: string) => {
-      const roomNumber = randomRoomNumber();
-      addUserToRoom(userId, socket.id, roomNumber);
+      addUserToRoom(userId, socket.id);
       io.emit("getUsers", users);
-      socket.emit("roomNumber", roomNumber);
     });
 
     io.emit("welcome","helloo")
 
     // Handle "send-message" event
     socket.on("send-message", ({ senderId, receiverId, text }) => {
-      const receiver = getUsersInRoom("room1").find((user:User)=> user.userId === receiverId);
+      const receiver = getUserById(receiverId);
       if (receiver && receiver.socketId) {
         io.to(receiver.socketId).emit("getMessage", {
           senderId,

@@ -29,7 +29,7 @@ const PlayerList = () => {
 
   const handleUserClick = (player: Player) => {
     
-    dispatch(setSelectedPlayers([player]));
+    dispatch(setSelectedPlayers(player));
   };
 
   return (

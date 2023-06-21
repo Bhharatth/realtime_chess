@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Socket } from "socket.io-client";
 
 const userSlice = createSlice({
   name: "user",
@@ -7,7 +8,9 @@ const userSlice = createSlice({
       _id: null,
       username: null,
       email: null,
-      __v: 0
+      __v: 0,
+      socketId: null,
+      coPlayerId: null,
     },
     isFetching: false,
     error: false,
@@ -35,8 +38,14 @@ const userSlice = createSlice({
       state.isFetching = false;
       state.error = true;
     },
+    setSocketId:(state, action)=> {
+      state.currentUser.socketId = action.payload;
+    },
+    setCoPlyerId:(state, action)=> {
+      state.currentUser.coPlayerId = action.payload;
+    },
   },
 });
 
-export const { loginStart, loginSuccess, loginFailure , registerFailure,registerStart,registerSuccess} = userSlice.actions;
+export const { loginStart, loginSuccess, loginFailure , registerFailure,registerStart,registerSuccess, setSocketId, setCoPlyerId} = userSlice.actions;
 export default userSlice.reducer;

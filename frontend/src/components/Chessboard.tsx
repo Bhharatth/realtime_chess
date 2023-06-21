@@ -1,21 +1,27 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./chessboard.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { Socket } from "socket.io-client";
 import PlayerList from "./playerList/PlayerList";
+import { setSocketId } from "../redux/userSlice";
 
 const io = require("socket.io-client");
 
 const Chessboard = () => {
   const socket = useRef<Socket | undefined>();
-  const [spot, setSpot] = useState(null);
-
+  const [currentChat, setCurrentChat] = useState<{
+    rowIndex: number;
+    cellIndex: number;
+  } | null>(null);
+  const [currentCoPlayer, setCurrentCoPlayer] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  
   const user = useSelector((state: RootState) => state.user);
-  const selectedUser = useSelector((state: RootState) => state.selectedPlayer);
-  console.log(selectedUser);
+  // console.log(user)
+  const selectedUser = useSelector((state: RootState) => state.selectedPlayer?.currentPlayer?._id);
+  console.log(selectedUser)
   const userId = user.currentUser ? user.currentUser._id : null;
-   const reciverId = "";
 
   const chessboardArray = [
     ["1,1", "1,2", "1,3", "1,4", "1,5", "1,6", "1,7", "1,8"],
@@ -37,23 +43,51 @@ const Chessboard = () => {
 
   useEffect(() => {
     socket.current?.emit("add_user", userId);
-    socket.current?.on("getUsers", (data: object) => {
+    // socket.current?.on("getUsers", (data: object) => {
+    //   console.log(data);
+    // });
+  }, [user]);
+
+  useEffect(() => {
+    socket.current?.on("getUsers", (data) => {
+    //  console.log(data)
+    });
+  }, []);
+  // console.log(currentCoPlayer)
+
+  useEffect(() => {
+    socket.current?.on("getMessage", (data: object) => {
       console.log(data);
     });
-  }, [user]);
+  }, []);
 
   //geting users from socket client
   useEffect(() => {}, []);
 
   function handleClick(rowIndex: number, cellIndex: number) {
-    console.log(`${rowIndex},${cellIndex}`);
-    const message = {rowIndex,cellIndex};
-    socket.current?.emit("send_message",({userId, reciverId,message}))
+    const message = { rowIndex, cellIndex };
+    dispatch(setSocketId(socket.current?.id));
+    // const recieverId = currentCoPlayer;
   }
+
+  const handleMove = (e: any) => {
+    e.preventDefault();
+    const message = {
+      sender: user.currentUser._id,
+      text: currentChat,
+    };
+    const recieverId = currentCoPlayer;
+
+    socket.current?.emit("send_message", {
+      senderId: user.currentUser._id,
+      recieverId,
+      text: message,
+    });
+  };
 
   return (
     <div className="chessboard">
-      <PlayerList/>
+      <PlayerList />
       {chessboardArray.map((row, rowIndex) => (
         <div className="row" key={rowIndex}>
           {row.map((cell, cellIndex) => (
@@ -67,6 +101,7 @@ const Chessboard = () => {
           ))}
         </div>
       ))}
+      <button onClick={() => handleMove}>Move</button>
     </div>
   );
 };

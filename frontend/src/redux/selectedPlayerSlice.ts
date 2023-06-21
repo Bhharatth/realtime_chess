@@ -3,17 +3,17 @@ import { createSlice } from "@reduxjs/toolkit";
 const selectedPlayerSlice = createSlice({
     name: "selectedPlayer",
     initialState: {
-        selectedPlayer: {
+        currentPlayer: {
             _id: null,
             username: null,
             email: null,
-            __v: 0
+            __v: 0,
         },
     },
     reducers: {
 
         setSelectedPlayers: (state, action) => {
-            state.selectedPlayer = action.payload;
+            state.currentPlayer = action.payload;
         },
 
     },
